@@ -1,6 +1,6 @@
 # -*- mode: Makefile -*-
 
-# Copyright (c) 2015-2016, Grzegorz Junka
+# Copyright (c) 2015-2017, Grzegorz Junka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -100,11 +100,18 @@ clean-builderl:
 
 #-------------------------------------------------------------------------------
 
+# Determine the location of the erts-X.Y.Z folder in the OTP release
 OTP_PATH := $(ERL:%/bin/erl=%)
-ERTS ?= $(shell (cd $(OTP_PATH) && echo erts-*))
-OTP_ERTS := $(OTP_PATH)/$(ERTS)
-BUILD_INFO_FILE = $(notdir $(BUILD_INFO))
+ERTS := $(lastword $(strip $(subst /, ,$(OTP_PATH))))
+ifneq (,$(filter erts-%,$(ERTS)))
+  OTP_ERTS := $(OTP_PATH)
+  OTP_PATH := $(OTP_ERTS:%/$(ERTS)=%)
+else
+  ERTS := $(shell (cd $(OTP_PATH) && echo erts-*))
+  OTP_ERTS := $(OTP_PATH)/$(ERTS)
+endif
 
+BUILD_INFO_FILE = $(notdir $(BUILD_INFO))
 ERTS_BIN ?= $(ERTS)/bin
 
 $(ERTS_BIN)/%:
@@ -122,7 +129,7 @@ erts_files = $(ERTS_BIN)/nodetool $(ERTS_BIN)/runner $(ERTS_BIN)/env.sh \
 bin_files = bin/start.boot bin/start.script \
   bin/start_clean.boot bin/start_sasl.boot
 
-do-apps: $(a_appup_dests) $(erts_files) $(bin_files) \
+do-apps: dev-ext $(a_appup_dests) $(erts_files) $(bin_files) \
   $(foreach app_name,$(App_Names),$(app_name:%=%.app))
 
 $(DEV_BUILD_DONE): $(RELTOOL_CONFIG)

@@ -1,6 +1,6 @@
 # -*- mode: Makefile -*-
 
-# Copyright (c) 2015-2016, Peter-Henry Mander and Grzegorz Junka
+# Copyright (c) 2015-2017, Peter-Henry Mander and Grzegorz Junka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,8 @@ lib/%.app:
 	@mkdir -p $(dir $@)
 	sed -e \
 	  "s|%MODULES%|=MODULES=|g;s|%VSN%|=VSN=|g;s|{{modules}}|=MODULES=|g;s|{{vsn}}|=VSN=|g" < "$^" | \
+	sed -e \
+	  "s|@MODULES@|=MODULES=|g;s|@VSN@|=VSN=|g" | \
 	sed -e \
 	  "s|=APP=|$(p_name)|g;s|=MODULES=|$(p_ins_mod)|g;s|=VSN=|$(p_vsn)|g" \
 	  > "$@"
@@ -150,13 +152,15 @@ w_module = $(w_app_part)$(dep_separator)$(w_mod_part)
 w_src = $($(w_module:%=%_module_erl))
 w_vsn = $($(w_module:%=%_app_vsn))
 
+w_incl_dir = $(subst /ebin/,/include/,$(dir $@))
+
 lib/%.beam:
 	@mkdir -p $(dir $@)
 	$(ERLC) \
 	  $(ERLCFLAGS) \
 	  -DCOMPILE_TIME_STAMP='"$(DATE_NOW)"'\
 	  -DOTP_REL_VSN='$(OTP_REL_VSN)'\
-	  -I lib -I deps \
+	  -I $(w_incl_dir) -I lib -I deps \
 	  -o $(dir $@) \
 	  $(w_src)
 

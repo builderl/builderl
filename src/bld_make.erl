@@ -1,4 +1,4 @@
-%% Copyright (c) 2016, Grzegorz Junka
+%% Copyright (c) 2016-2017, Grzegorz Junka
 %% All rights reserved.
 %%
 %% Redistribution and use in source and binary forms, with or without
@@ -321,7 +321,7 @@ do_create_app(Src, Dst, DstPath) ->
     end.
 
 scan_app(Src, Dst, DstPath, OBin) ->
-    Pat = <<"=MODULES=|%MODULES%|{{modules}}">>,
+    Pat = <<"=MODULES=|%MODULES%|{{modules}}|@MODULES@">>,
     To = io_lib:format("~p", [?BLD_APP_MOD_RE]),
     Bin = iolist_to_binary(re:replace(OBin, Pat, To)),
     case erl_scan:string(binary_to_list(Bin)) of

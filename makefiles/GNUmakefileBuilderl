@@ -1,6 +1,6 @@
 # -*- mode: Makefile -*-
 
-# Copyright (c) 2015-2016, Grzegorz Junka
+# Copyright (c) 2015-2017, Grzegorz Junka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 ## Defaults, change if needed
 #-------------------------------------------------------------------------------
 # Details of the builderl repository
-BLDERLURL  ?= -b master git://github.com/yoonka/builderl.git $(BLDERLPATH)/
+BLDERLURL  ?= -b master git://github.com/builderl/builderl.git $(BLDERLPATH)/
 # An optional custom makefile to include
 CUSTOMMK   ?= GNUmakefileCustom
 #-------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 # -*- mode: Makefile -*-
 
-# Copyright (c) 2015-2016, Grzegorz Junka
+# Copyright (c) 2015-2017, Grzegorz Junka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
 #-------------------------------------------------------------------------------
 
 # Created from:
-# https://raw.githubusercontent.com/yoonka/builderl/master/makefiles/GNUmakefile
+# https://raw.githubusercontent.com/builderl/builderl/master/makefiles/GNUmakefile
 # This is the bootstrap makefile that only downloads the actual makefile.
 # Feel free to include either version in your project.
 # This version makes it easier to automatically include the latest version.
@@ -41,7 +41,10 @@
 ## Tested version known to compile riak_pb
 REBARURL  ?= https://github.com/yoonka/erlstrap/wiki/rebar
 ## Compilation flags
-# ERLCFLAGS ?= -W -v -pa deps/lager/ebin +debug_info +'{parse_transform, lager_transform}'
+# ERLCFLAGS ?= -v -Werror +debug_info \
+#   -pa deps/lager/ebin \
+#   +warn_export_all +warn_export_vars +warn_shadow_vars +warn_obsolete_guard \
+#   +'{parse_transform, lager_transform}'
 ##------------------------------------------------------------------------------
 
 ## These are defaults used in GNUmakefileBuilderl, change if needed
@@ -49,7 +52,7 @@ REBARURL  ?= https://github.com/yoonka/erlstrap/wiki/rebar
 ## Where builderl should be located in the project tree
 # BLDERLPATH ?= deps/builderl/
 ## Details of the builderl repository
-# BLDERLURL  ?= -b master git://github.com/yoonka/builderl.git $(BLDERLPATH)
+# BLDERLURL  ?= -b master git://github.com/builderl/builderl.git $(BLDERLPATH)
 ## An optional custom makefile to include
 # CUSTOMMK   ?= GNUmakefileCustom
 ##------------------------------------------------------------------------------
@@ -59,9 +62,14 @@ BLDERLPATH  := deps/builderl
 # Local name for the downloaded builderl/makefiles/GNUmakefileBuilderl
 BLDERLLOCAL := GNUmakefileBuilderl
 # URL to download the builderl/makefiles/GNUmakefileBuilderl makefile
-BLDERLMKURL := https://raw.githubusercontent.com/yoonka/builderl/master/makefiles/GNUmakefileBuilderl
+BLDERLMKURL := https://raw.githubusercontent.com/builderl/builderl/master/makefiles/GNUmakefileBuilderl
 
 ifneq (rm-builderl,$(filter $(MAKECMDGOALS),rm-builderl))
+
+# Additional optional compilation steps before executing target do-apps
+# Usually used with the makefile to compile specific behaviours and parse transforms
+.PHONY: dev-ext
+dev-ext:
 
 .PHONY: all
 all: get-deps tgz

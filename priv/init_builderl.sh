@@ -11,7 +11,7 @@ git init
 git submodule add https://github.com/yoonka/builderl.git deps/builderl
 
 # Copy project skeleton from the cloned builderl submodule
-cp -r -i deps/builderl/priv/skel/* .
+cp -r -i -L deps/builderl/priv/skel/* .
 cp -i deps/builderl/priv/_gitignore .gitignore
 
 # Initialize builderl
@@ -21,6 +21,7 @@ cp -i deps/builderl/makefiles/GNUmakefileBuilderl .
 # Prefer gmake over make if installed
 cmd=`(type gmake 2>/dev/null || type make 2>/dev/null) | tail -1 | awk '{ print $NF }'`
 $cmd check-rebar
+ln -s ../deps/builderl bin/builderl
 ./bin/builderl.esh -uy
 
 # Add all created files to the new repository
