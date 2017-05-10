@@ -59,9 +59,13 @@ d_module = $*
 d_erl_dep = $(d_module:%=$(dep_dir)%.erl.d)
 d_erl = $($(d_module:%=%_module_erl))
 d_beam = $($(d_module:%=%_module_beam))
-d_dir = $(dir $(d_erl))
+d_src_dir = $(dir $(d_erl))
+d_inc_dir = $(d_src_dir:%/src/=%)/include/
 d_src_headers = $(shell sed -n $(include_regexp) < $(d_erl))
-d_include = $(d_src_headers:%=$(d_dir)%)
+d_src_include = $(d_src_headers:%=$(d_src_dir)%)
+d_inc_include = $(d_src_headers:%=$(d_inc_dir)%)
+d_include = $(shell (type $(d_src_include) 2>/dev/null || type $(d_inc_include) 2>/dev/null) \
+  | tail -1 | awk '{ print $$NF }')
 d_lib_headers = $(shell sed -n $(include_lib_regexp) < $(d_erl))
 d_include_lib = $(wildcard $(d_lib_headers:%=lib/%))
 d_include_files = $(d_include) $(d_include_lib)
@@ -90,7 +94,7 @@ d_parse_xform_dep = \
 #
 #         "cannot stat 'XXX.erl': No such file or directory"
 #
-#         The $(d_dir) dependency does not cope with the removal and
+#         The $(d_src_dir) dependency does not cope with the removal and
 #         relocation of a .erl file. Deleting the .erl.d file is a remedy.
 #
 #         Also related: the .app file of application where the .erl file is
@@ -100,7 +104,7 @@ d_parse_xform_dep = \
 #
 tmp/dependencies/%.erl.d:
 	@mkdir -p $(dir $@)
-	@echo "$(d_erl_dep): $(d_erl) $(d_dir)" > $(d_erl_dep)
+	@echo "$(d_erl_dep): $(d_erl) $(d_src_dir)" > $(d_erl_dep)
 	@echo >> $(d_erl_dep)
 	@echo "$(d_parse_xform_dep)" >> $(d_erl_dep)
 	@echo >> $(d_erl_dep)
@@ -141,6 +145,20 @@ d_app_modules = $(foreach app_name,$(d_app_name),$(App_Beam_Files))
 tmp/dependencies/app.%.plt.d:
 	@mkdir -p $(dir $@)
 	@echo "$(d_app_plt): $(d_app_modules)" >> $(d_plt_dep)
+
+l_dtl_src = lib/$(subst /ebin/,/templates/,$*).dtl
+
+lib/%_dtl.beam:
+	@mkdir -p $(dir $@)
+	ERL_LIBS=deps:lib $(ERL) -noshell -eval "\
+	  Compile = fun(F) -> \
+	    Module = list_to_atom( \
+	      string:to_lower(filename:basename(F, \".dtl\")) ++ \"_dtl\"), \
+		erlydtl_compiler:compile(F, Module, [{out_dir, \"$(dir $@)\"}]) \
+	  end, \
+	  _ = [Compile(F) || F <- string:tokens(\"$(l_dtl_src)\", \" \")], \
+	  init:stop() \
+	"
 
 #
 # NOTE: implicit rule to compile beam files from erl source.
