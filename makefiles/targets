@@ -31,29 +31,32 @@
 	chmod +x ./rebar
 
 ## Take the local version if present, then check if it is installed, then download if none could be found
-REBAR=$(shell (type ./rebar 2>/dev/null || type rebar 2>/dev/null || echo ./rebar) | tail -1 | awk '{ print $$NF }')
+REBARCMD = $(shell (type ./rebar 2>/dev/null || type rebar 2>/dev/null || echo ./rebar) | tail -1 | awk '{ print $$NF }')
+REBARCFG ?= rebar.config
+$(warning $(REBARCFG))
+REBAR := $(REBARCMD) -C $(REBARCFG)
 
 .PHONY: get-deps rm-deps redo-deps compile-deps clean-deps check-rebar
-get-deps: $(REBAR)
+get-deps: $(REBARCMD)
 	$(REBAR) get-deps
 	./bin/deps.esh get
 
-rm-deps: $(REBAR)
+rm-deps: $(REBARCMD)
 	$(REBAR) del-deps
 	./bin/deps.esh rm
 
-redo-deps: $(REBAR)
+redo-deps: $(REBARCMD)
 	$(REBAR) del-deps
 	$(REBAR) get-deps
 	./bin/deps.esh rm get
 
-compile-deps: $(REBAR)
+compile-deps: $(REBARCMD)
 	$(REBAR) compile
 
-clean-deps: $(REBAR)
+clean-deps: $(REBARCMD)
 	$(REBAR) clean
 
-check-rebar: $(REBAR)
+check-rebar: $(REBARCMD)
 
 .PHONY: bld_deps
 bld_deps: compile-deps
