@@ -68,13 +68,13 @@ BLDERLMKURL := https://raw.githubusercontent.com/builderl/builderl/master/makefi
 
 ifneq (rm-builderl,$(filter $(MAKECMDGOALS),rm-builderl))
 
+.PHONY: all
+all: get-deps tgz
+
 # Additional optional compilation steps before executing target do-apps
 # Usually used with the makefile to compile specific behaviours and parse transforms
 .PHONY: dev-ext
 dev-ext:
-
-.PHONY: all
-all: get-deps tgz
 
 ifeq ($(wildcard $(BLDERLLOCAL)),)
 $(shell erl -noshell -s inets -s ssl -eval \

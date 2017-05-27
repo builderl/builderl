@@ -33,7 +33,6 @@
 ## Take the local version if present, then check if it is installed, then download if none could be found
 REBARCMD = $(shell (type ./rebar 2>/dev/null || type rebar 2>/dev/null || echo ./rebar) | tail -1 | awk '{ print $$NF }')
 REBARCFG ?= rebar.config
-$(warning $(REBARCFG))
 REBAR := $(REBARCMD) -C $(REBARCFG)
 
 .PHONY: get-deps rm-deps redo-deps compile-deps clean-deps check-rebar
