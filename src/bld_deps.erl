@@ -585,6 +585,7 @@ execute_eunit(Path, Options) ->
 run_test(Mod, Opts) ->
     case eunit:test(Mod, Opts) of
         ok -> ok;
+        error -> test_error(Mod, Opts, error);
         {error, Err} -> test_error(Mod, Opts, Err)
     end.
 
