@@ -3,6 +3,8 @@
 /tmp/
 /releases
 
+/deps/goldrush/
+/deps/lager/
 /deps/node_package/
 
 /bin/*.boot
@@ -11,12 +13,17 @@
 /lib/*/ebin/
 /lib/*/priv/mibs/
 
+/lib/migresia/
 /lib/yolf/
 
 /erts-[0-9].[0-9]/
 /erts-[0-9].[0-9].[0-9]/
+/erts-[0-9][0-9].[0-9][0-9].[0-9]/
 /erts-[0-9].[0-9][0-9].[0-9]/
 /erts-[0-9].[0-9].[0-9].[0-9]/
+/erts-[0-9][0-9].[0-9].[0-9].[0-9]/
+/erts-[0-9].[0-9][0-9].[0-9].[0-9]/
+/erts-[0-9][0-9].[0-9][0-9].[0-9].[0-9]/
 
 .eunit
 *.o
