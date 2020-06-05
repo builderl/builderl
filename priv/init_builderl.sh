@@ -4,11 +4,11 @@
 # It should be executed from an empty folder for the new project, e.g.:
 # mkdir myproject_rel
 # cd myproject_rel
-# curl -s https://raw.githubusercontent.com/yoonka/builderl/master/priv/init_builderl.sh | sh
+# curl -s https://raw.githubusercontent.com/builderl/builderl/master/priv/init_builderl.sh | sh
 
 # Initialize git repository for the new project
 git init
-git submodule add https://github.com/yoonka/builderl.git deps/builderl
+git submodule add https://github.com/builderl/builderl.git deps/builderl
 
 # Copy project skeleton from the cloned builderl submodule
 cp -r -i -L deps/builderl/priv/skel/* .
