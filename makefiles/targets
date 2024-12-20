@@ -24,14 +24,14 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-./rebar:
+./rebar3:
 	$(ERL) -noshell -s inets -s ssl \
-	  -eval 'httpc:request(get, {"$(REBARURL)", []}, [], [{stream, "./rebar"}])' \
+	  -eval 'httpc:request(get, {"$(REBARURL)", []}, [], [{stream, "./rebar3"}])' \
 	  -s init stop
-	chmod +x ./rebar
+	chmod +x ./rebar3
 
 ## Take the local version if present, then check if it is installed, then download if none could be found
-REBARCMD = $(shell (type ./rebar 2>/dev/null || type rebar 2>/dev/null || echo ./rebar) | tail -1 | awk '{ print $$NF }')
+REBARCMD = $(shell (type ./rebar3 2>/dev/null || type rebar3 2>/dev/null || echo ./rebar3) | tail -1 | awk '{ print $$NF }')
 REBARCFG ?= rebar.config
 REBAR := $(REBARCMD) -C $(REBARCFG)
 

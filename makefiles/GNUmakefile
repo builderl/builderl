@@ -39,7 +39,7 @@
 ## Project-specific variables and settings (Change where required)
 ##------------------------------------------------------------------------------
 ## Tested version known to compile riak_pb
-REBARURL ?= https://github.com/yoonka/erlstrap/wiki/rebar
+REBARURL ?= https://github.com/yoonka/erlstrap/wiki/rebar3
 ## Allows to override name of the config file
 # REBARCFG ?= rebar.config
 ## Compilation flags
