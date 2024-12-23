@@ -1,6 +1,4 @@
-%% -*- mode: erlang -*-
-
-%% Copyright (c) 2015-2017, Grzegorz Junka
+%% Copyright (c) 2016, Grzegorz Junka
 %% All rights reserved.
 %%
 %% Redistribution and use in source and binary forms, with or without
@@ -24,10 +22,25 @@
 %% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 %% EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-{application, builderl,
- [{description, "Build and install OTP-friendly releases"},
-  {vsn, "0.3.0"},
-  {modules, []},
-  {registered, []},
-  {applications, [kernel, stdlib, sasl]}
- ]}.
+-module(bld_mk_plugin).
+
+-callback init(Args :: list(term())) -> any().
+
+-callback handle_dep_mk(DepPath :: string(),
+                        State :: any()) ->
+    'stop' |
+    {'ok', (State :: any())}.
+
+-callback handle_dir_mk(SrcPath :: string(),
+                        State :: any()) ->
+    'stop' |
+    {'ignore', State :: any()} |
+    {'ok', (State :: any())}.
+
+-callback handle_src_mk('erl',
+                        SrcFile :: string(),
+                        Options :: list(term()),
+                        State :: any()) ->
+    'stop' |
+    {'ignore', State :: any()} |
+    {'ok', Options :: list(term()), State :: any()}.

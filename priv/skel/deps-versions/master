@@ -1,0 +1,5 @@
+%% -*- erlang -*-
+
+{"0.0.3",        "https://github.com/yoonka/migresia.git", "migresia"}.
+
+"deploy".

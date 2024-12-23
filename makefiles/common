@@ -1,5 +1,6 @@
 # -*- mode: Makefile -*-
-# Copyright (c) 2015, Peter Mander and Grzegorz Junka
+
+# Copyright (c) 2015-2016, Peter-Henry Mander and Grzegorz Junka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -91,3 +92,6 @@ rw_collect_dirs = $(filter %/,$(wildcard $(1:%/=%)/*/))
 rw_dirs_only = $(rw_collect_dirs:%/=%)
 rw_files_only = $(filter-out %/,$(wildcard $(1:%/=%)/*/))
 rwildcard = $(foreach dir, $(rw_dirs_only), $(call rwildcard,$(dir)) ) $(rw_files_only)
+
+incs := rel_app_vars sources targets debug
+include $(foreach file,$(incs),$(BLDERLPATH)/makefiles/$(file))

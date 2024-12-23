@@ -1,5 +1,6 @@
 %% -*- erlang -*-
-%% Copyright (c) 2015, Grzegorz Junka
+
+%% Copyright (c) 2015-2016, Grzegorz Junka
 %% All rights reserved.
 %%
 %% Redistribution and use in source and binary forms, with or without
@@ -29,31 +30,28 @@
 %% The link is always in the bin folder of the project's root folder.
 -define(BUILDERLROOT, "bin").
 -define(BUILDERLLINK, filename:join(?BUILDERLROOT, "builderl")).
--define(BLDLOADMOD, "bld_load").
+-define(BOOTMODULE, "bld_make").
 
 load_builderl() ->
     {ok, Cwd} = file:get_cwd(),
-    SrcPath = filename:join([Cwd, ?BUILDERLLINK, "src"]),
-    DstPath = filename:join([Cwd, ?BUILDERLLINK, "ebin"]),
-    io:format("== Loading 'builderl' from '~s' ==~n", [DstPath]),
+    DepPath = filename:join(Cwd, ?BUILDERLLINK),
 
     %% Just try to load and compile on-the-fly if needed
-    %% Proper compilation will be done in bld_load anyway
-    case code:load_abs(filename:join(DstPath, ?BLDLOADMOD)) of
-        {module, Mod} ->
-            io:format("Pre-loaded: ~p~n", [Mod]);
+    %% Proper compilation will be done in bld_make anyway
+    case code:load_abs(filename:join([DepPath, "ebin", ?BOOTMODULE])) of
+        {module, _Mod} ->
+            ok;
         _ ->
-            File = filename:join(SrcPath, ?BLDLOADMOD),
+            File = filename:join([Cwd, ?BUILDERLLINK, "src", ?BOOTMODULE]),
             case compile:file(File, [binary, report]) of
                 {ok, Mod, Bin} ->
-                    {module, Mod} = code:load_binary(Mod, File ++ ".erl", Bin),
-                    io:format("Compiled and loaded: '~p'.~n", [Mod]);
+                    {module, _Mod} = code:load_binary(Mod, File ++ ".erl", Bin);
                 Err ->
                     io:format("Error when loading '~s': ~p~n.", [File, Err]),
                     halt(1)
             end
     end,
 
-    bld_load:boot(SrcPath, DstPath, ?BUILDERLROOT),
+    bld_make:boot(DepPath, ?BUILDERLROOT),
 
-    io:format("== Loading 'builderl' finished. ==~n").
+    io:format("== Using 'builderl' from '~s' ==~n", [DepPath]).

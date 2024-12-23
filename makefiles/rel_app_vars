@@ -1,5 +1,6 @@
 # -*- mode: Makefile -*-
-# Copyright (c) 2015, Peter Mander and Grzegorz Junka
+
+# Copyright (c) 2015-2016, Peter-Henry Mander and Grzegorz Junka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -45,57 +46,58 @@
 a_app_src_files = $(shell find lib/ -maxdepth 3 -name *.app.src)
 App_Names := $(notdir $(a_app_src_files:%.app.src=%))
 
-App_Src_Dir = $(app_name:%=lib/%/src/)
-
 a_app_vsn_mk = $(wildcard lib/$(app_name)/src/vsn.mk)
 a_app_version = $(if $(a_app_vsn_mk),\
-  $(shell sed -n $(vsn_regexp) < $(a_app_vsn_mk) ),\
-  ($(info INFO: The application $(app_name) is missing a vsn.mk file), \
-    unknown_vsn))
-
-a_app_erl_files = $(wildcard $(App_Src_Dir:%=%*.erl))
-a_app_modules = $(notdir $(a_app_erl_files:%.erl=%))
+  $(shell sed -n $(vsn_regexp) < $(a_app_vsn_mk) ), unknown_vsn_missing_vsn_mk_file)
 
 # List all appup files that needs to be copied from src to ebin for each app
 a_appup_srcs = $(shell find lib/*/src/*.appup.src 2> /dev/null)
 AppUp_Names = $(subst /src/,/ebin/,$(a_appup_srcs))
 a_appup_dests = $(AppUp_Names:%.appup.src=%.appup)
 
-# NOTE: Map the application name to:
-#        * the modules
-#        * the version
-#
-$(foreach app_name, $(App_Names),\
-  $(eval $(app_name)_modules := $(a_app_modules)) \
-  $(eval $(app_name)_has_vsn := $(a_app_version)) )
-
-a_app_vsn = $($(app_name)_has_vsn)
-App_Ebin_Dir = $(app_name:%=lib/%/ebin/)
-App_Modules = $($(app_name)_modules)
-App_Beam_Files = $(App_Modules:%=$(App_Ebin_Dir)%.beam)
-
+App_Src_Dir = lib/$(app_name)/src/
+App_Ebin_Dir = lib/$(app_name)/ebin/
 App_Mibs_Dir = lib/$(app_name)/priv/mibs/
+App_Dtls_Dir = lib/$(app_name)/templates/
 
-a_mib_src_files = $(wildcard $(App_Src_Dir:%=%*.mib))
+a_app_erl_files = $(wildcard $(App_Src_Dir)*.erl)
+a_app_modules = $(notdir $(a_app_erl_files:%.erl=%))
+
+a_mib_src_files = $(wildcard $(App_Src_Dir)*.mib)
 a_mib_bin_files = $(a_mib_src_files:$(App_Src_Dir)%.mib=$(App_Mibs_Dir)%.bin)
 a_mibs = $(notdir $(a_mib_src_files:%.mib=%))
 
+a_dtl_files = $(wildcard $(App_Dtls_Dir)*.dtl)
+a_dtls = $(notdir $(a_dtl_files:%.dtl=%))
+
 # NOTE: Map the application name to:
-#       * the bin files in the priv/mibs directory
+#        * the modules
+#        * the version
+#        * the bin files in the priv/mibs directory
 #
 $(foreach app_name, $(App_Names),\
+  $(eval $(app_name)_has_vsn := $(a_app_version)) \
+  $(eval $(app_name)_modules := $(a_app_modules)) \
   $(eval $(app_name)_mibs := $(a_mibs)) \
-  $(eval $(app_name)_mib_bin_files := $(a_mib_bin_files)) )
+  $(eval $(app_name)_mib_bin_files := $(a_mib_bin_files)) \
+  $(eval $(app_name)_dtls := $(a_dtls)) )
 
+a_app_vsn = $($(app_name)_has_vsn)
+App_Modules = $($(app_name)_modules)
 App_Mibs = $($(app_name)_mibs)
-
+App_Dtls = $($(app_name)_dtls)
 a_app_mib_bin_files = $($(app_name)_mib_bin_files)
+
 a_app_file = $(app_name:%=$(App_Ebin_Dir)%.app)
 a_app_src_file = $(app_name:%=$(App_Src_Dir)%.app.src)
 
+App_Beam_Files = $(App_Modules:%=$(App_Ebin_Dir)%.beam)
+App_Dtl_Beam_Files = $(App_Dtls:%=$(App_Ebin_Dir)%_dtl.beam)
+
 a_dependencies = $(sort \
-  $(App_Beam_Files) \
   $(a_app_file) \
+  $(App_Beam_Files) \
+  $(App_Dtl_Beam_Files) \
   $(a_app_mib_bin_files) )
 
 $(foreach app_name, $(App_Names),\
