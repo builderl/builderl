@@ -25,7 +25,7 @@
 #-------------------------------------------------------------------------------
 
 # Created from:
-# https://raw.githubusercontent.com/yoonka/builderl/master/makefiles/GNUmakefile
+# https://raw.githubusercontent.com/builderl/builderl/master/makefiles/GNUmakefile
 # This is the bootstrap makefile that only downloads the actual makefile.
 # Feel free to include either version in your project.
 # This version makes it easier to automatically include the latest version.
@@ -38,7 +38,7 @@
 ## Project-specific variables and settings (Change where required)
 ##------------------------------------------------------------------------------
 ## Tested version known to compile riak_pb
-# REBARURL  ?= https://github.com/yoonka/erlstrap/wiki/rebar
+# REBARURL  ?= https://github.com/builderl/erlstrap/wiki/rebar3
 ## Compilation flags
 # ERLCFLAGS ?= -W -v -pa deps/lager/ebin +debug_info +'{parse_transform, lager_transform}'
 ##------------------------------------------------------------------------------
@@ -48,7 +48,7 @@
 ## Where builderl should be located in the project tree
 # BLDERLPATH ?= deps/builderl/
 ## Details of the builderl repository
-# BLDERLURL  ?= -b master git://github.com/yoonka/builderl.git $(BLDERLPATH)
+# BLDERLURL  ?= -b master git://github.com/builderl/builderl.git $(BLDERLPATH)
 ## An optional custom makefile to include
 # CUSTOMMK   ?= GNUmakefileCustom
 ##------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ BLDERLPATH  := deps/builderl
 # Local name for the downloaded builderl/makefiles/GNUmakefileBuilderl
 BLDERLLOCAL := GNUmakefileBuilderl
 # URL to download the builderl/makefiles/GNUmakefileBuilderl makefile
-BLDERLMKURL := https://raw.githubusercontent.com/yoonka/builderl/master/makefiles/GNUmakefileBuilderl
+BLDERLMKURL := https://raw.githubusercontent.com/builderl/builderl/master/makefiles/GNUmakefileBuilderl
 
 ifneq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),rm-builderl))
 
