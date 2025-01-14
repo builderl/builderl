@@ -104,7 +104,9 @@ clean-builderl:
 
 # Determine the location of the erts-X.Y.Z folder in the OTP release
 OTP_PATH := $(ERL:%/bin/erl=%)
+
 ERTS := $(lastword $(strip $(subst /, ,$(OTP_PATH))))
+
 ifneq (,$(filter erts-%,$(ERTS)))
   OTP_ERTS := $(OTP_PATH)
   OTP_PATH := $(OTP_ERTS:%/$(ERTS)=%)
@@ -112,11 +114,11 @@ else
   ERTS := $(shell (cd $(OTP_PATH) && echo erts-*))
   OTP_ERTS := $(OTP_PATH)/$(ERTS)
 endif
-
 BUILD_INFO_FILE = $(notdir $(BUILD_INFO))
 ERTS_BIN ?= $(ERTS)/bin
 
 $(ERTS_BIN)/%:
+	@echo "Linking $* to $(ERTS_BIN)..."
 	@mkdir -p $(ERTS_BIN)
 	@ln -s `(type $(OTP_ERTS)/bin/$* 2>/dev/null || echo ../../$(NODETOOL_DIR)/$*)\
 		| tail -1 | awk '{ print $$NF }'` $(ERTS_BIN)/$*
@@ -131,8 +133,21 @@ erts_files = $(ERTS_BIN)/nodetool $(ERTS_BIN)/runner $(ERTS_BIN)/env.sh \
 bin_files = bin/start.boot bin/start.script \
   bin/start_clean.boot bin/start_sasl.boot
 
-do-apps: dev-ext $(a_appup_dests) $(erts_files) $(bin_files) \
+move-deps:
+	@mkdir -p deps
+	@echo "Syncing dependencies from _build/default/lib to deps folder"
+	@for dep in $(shell ls _build/default/lib); do \
+		if [ ! -d "lib/$$dep" ]; then \
+			rsync -a _build/default/lib/$$dep/ deps/$$dep/; \
+		fi; \
+	done
+
+do-apps: $(a_appup_dests) $(erts_files) $(bin_files) \
   $(foreach app_name,$(App_Names),$(app_name:%=%.app))
+
+
+
+
 
 $(DEV_BUILD_DONE): $(RELTOOL_CONFIG)
 	if [ -L releases ]; then rm releases; fi
@@ -179,26 +194,26 @@ stop:
 	./bin/stop.esh
 
 .PHONY: dev rel tgz
-dev: bld_deps do-apps $(DEV_BUILD_DONE)
+dev: bld_deps move-deps do-apps $(DEV_BUILD_DONE)
 	@echo Done! Use \'./bin/init.esh\' to install and then \'./bin/start.esh\' to boot.
 
-rel: bld_deps do-apps $(REL_BUILD_DONE) rel_files
+rel: bld_deps move-deps  do-apps $(REL_BUILD_DONE) rel_files
 	@echo Done! New release has been created in \'$(REL_PATH)\'.
 
-tgz: clean-tgz bld_deps do-apps $(REL_BUILD_DONE) rel_files run_tgz
+tgz: clean-tgz bld_deps move-deps  do-apps $(REL_BUILD_DONE) rel_files run_tgz
 	@echo Done! Created file: \'$(dir $(REL_PATH))$(tgz_rel_name)\'.
 
 
 .PHONY: test dev_test rel_test tgz_test
-test: bld_deps_test do-apps
+test: bld_deps_test move-deps do-apps
 	@echo Done! Use \'./bin/deps.esh eunit\' to run unit tests.
 
-dev_test: bld_deps_test do-apps $(DEV_BUILD_DONE)
+dev_test: bld_deps move-deps_test do-apps $(DEV_BUILD_DONE)
 	@echo Done! Use \'./bin/init.esh\' to install and then \'./bin/start.esh\' to boot.
 
-rel_test: bld_deps_test do-apps $(REL_BUILD_DONE) rel_files
+rel_test: bld_deps_test move-deps do-apps $(REL_BUILD_DONE) rel_files
 	@echo Done! New release has been created in \'$(REL_PATH)\'.
 
-tgz_test: clean-tgz bld_deps_test do-apps $(REL_BUILD_DONE) rel_files run_tgz
+tgz_test: clean-tgz bld_deps_test move-deps do-apps $(REL_BUILD_DONE) rel_files run_tgz
 	@echo Done! Created file: \'$(dir $(REL_PATH))$(tgz_rel_name)\'.
 
