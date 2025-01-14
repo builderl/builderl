@@ -93,7 +93,14 @@ clean-dev:
 	rm -f $(bin_files)
 	rm -f $(DEV_BUILD_DONE) $(BUILD_INFO) $(LOCAL_VM_ARGS)
 
-clean: dep-clean clean-tgz clean-rel clean-dev clean-deps
+clean-new-deps:
+	@echo "Cleaning new dependencies from deps"
+	@for dep in $(shell ls _build/default/lib); do \
+		rm -rf deps/$$dep/; \
+	done
+
+
+clean: dep-clean clean-new-deps clean-tgz clean-rel clean-dev clean-deps
 	rm -rf $(clean_app_dirs) $(clean_editor_backup)
 
 .PHONY: clean-builderl
@@ -134,7 +141,6 @@ bin_files = bin/start.boot bin/start.script \
   bin/start_clean.boot bin/start_sasl.boot
 
 move-deps:
-	@mkdir -p deps
 	@echo "Syncing dependencies from _build/default/lib to deps folder"
 	@for dep in $(shell ls _build/default/lib); do \
 		if [ ! -d "lib/$$dep" ]; then \
