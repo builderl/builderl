@@ -3,7 +3,7 @@
 {application, deploy,
  [{description, "Service configuration tool"},
   {vsn, "0.0.2"},
-  {modules, [=MODULES=]},
+  {modules, []},
   {registered, []},
   {applications, [kernel, stdlib]}
  ]}.
