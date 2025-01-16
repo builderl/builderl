@@ -88,7 +88,14 @@ format_line(IsWarning, File, {Line, Module, Info}) ->
      Module:format_error(Info), <<"\n">>].
 
 get_line(none) -> <<"">>;
-get_line(Integer) -> integer_to_list(Integer).
+
+get_line(Integer) when is_integer(Integer) -> 
+    integer_to_list(Integer);
+get_line({LineNumber, _}) when is_integer(LineNumber) ->
+    integer_to_list(LineNumber);
+get_line(Invalid) ->
+    error({invalid_argument, Invalid}).
+
 
 get_warning(false) -> <<"">>;
 get_warning(true) -> <<"Warning: ">>.
